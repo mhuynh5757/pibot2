@@ -1,7 +1,21 @@
-h1 Look at this sick nasty homepage {{message_to_send}}
-form
-  input(type='text' ng-model='message_to_send')
-  input(type='submit' value='Startup' ng-click='startup()')
-form
-  input(type='submit' value='Logout' ng-click='logout()')
-div(ng-repeat='point in data track by $index') {{point}}
+div.header
+  div.title Robot Command Center
+
+div
+  canvas.map(id='map' width='400' height='400')
+
+div.logHeader Log
+div.content(id='log')
+  div.log
+    ul
+      li(ng-repeat='line in log track by $index') {{line}}
+    
+div.footer
+  form
+    input(type='number' ng-model='goal_x')
+    input(type='number' ng-model='goal_y')
+    input(type='submit' value='Call Robot' ng-click='send_command("call robot")')
+  form
+    input(type='submit' value='Make Map' ng-click='send_command("make map")')
+  form
+    input(type='submit' value='Logout' ng-click='logout()')
