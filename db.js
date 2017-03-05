@@ -1,16 +1,11 @@
-var mongodb = require('mongodb');
-var url = 'mongodb://localhost:27017/pibot2_dev';
-
-var _db;
+var Datastore = require('@google-cloud/datastore')({
+  prefix: 'express-sessions',
+  projectId: process.env.GCLOUD_PROJECT,
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+});
 
 module.exports = {
-  connectToServer: function(callback) {
-    mongodb.MongoClient.connect(url, function(err, db) {
-      _db = db;
-      return callback(err);
-    });
-  },
   getDb: function() {
-    return _db;
+    return Datastore;
   }
 }

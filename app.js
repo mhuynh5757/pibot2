@@ -6,8 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var db = require('./db').getDb();
-var expressSession = require('express-session');
-var MongoStore = require('connect-mongo')(expressSession);
+var session = require('express-session');
+var DatastoreStore = require('@google-cloud/connect-datastore')(session);
 var passport = require('passport');
 
 var routes = require('./routes');
@@ -26,13 +26,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // set up session middleware so logins are persistent
-var sessionMiddleware = expressSession({
-  secret: 'yoloswagorghini',
-  store: new MongoStore({'db': db}),
+app.use(session({
+  store: new DatastoreStore({ dataset: db }),
+  secret: '#yoloswag',
   resave: false,
   saveUninitialized: false
-});
-app.use(sessionMiddleware);
+}));
+
+// set up passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -47,8 +48,9 @@ passport.serializeUser(function(user, done) {
   done(null, {username: user.username});
 });
 passport.deserializeUser(function(user, done) {
-  db.collection('credentials').findOne({'username': user.username}, function(err, _user) {
-    done(null, _user);
+  db.runQuery(db.createQuery('Credential').filter('username', '=', user.username))
+  .then(function(users) {
+    return done(null, users[0][0]);
   });
 });
 

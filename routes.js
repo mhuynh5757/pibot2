@@ -10,17 +10,17 @@ passport.use('login', new LocalStrategy(function(username, password, done) {
   if (username.length > 20 && password.length > 20) {
     return done(null, false);
   }
-  return db.collection('credentials').findOne({'username': username})
-  .then(function(user) {
-    if (!user) {
+  db.runQuery(db.createQuery('Credential').filter('username', '=', username))
+  .then(function(users) {
+    if (users[0].length == 0) {
       return done(null, false);
     }
-    bcrypt.compare(password, user.password)
+    bcrypt.compare(password, users[0][0].password)
     .then(function(res) {
       if (!res) {
         return done(null, false);
       }
-      return done(null, user);
+      return done(null, users[0][0]);
     });
   });
 }));
@@ -50,26 +50,28 @@ router.get('/views/:filename', function(req, res, next) {
   if (req.body.username.length > 20 && req.body.password.length > 20) {
     return res.status(400).send();
   }
-  return db.collection('credentials').findOne({'username': req.body.username})
   
-  .then(function(user) {
-    if (user) {
+  db.runQuery(db.createQuery('Credential').filter('username', '=', req.body.username))
+  .then(function(users) {
+    if (users[0].length == 0) {
+      bcrypt.hash(req.body.password, 12)
+      .then(function(hash) {
+        var newAcc = {
+          key: db.key('Credential'),
+          data: {
+            username: req.body.username,
+            password: hash
+          }
+        }
+        db.save(newAcc);
+        return res.status(200).send();
+      });
+    }
+    else {
       return res.status(400).send();
     }
-    return bcrypt.hash(req.body.password, 12);
-  })
-  
-  .then(function(hash) {
-    var newUser = {
-      'username': req.body.username,
-      'password': hash
-    };
-    return db.collection('credentials').insertOne(newUser);
-  })
-  
-  .then(function() {
-    return res.status(200).send();
   });
+  
 })
 
 .post('/logout', function(req, res, next) {

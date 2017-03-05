@@ -73,7 +73,6 @@ function($scope, $http, $state) {
   
   $scope.message_to_send = ''
   $scope.startup = function() {
-    console.log($scope.message_to_send);
     socket.emit('startup', $scope.message_to_send);
   }
   
@@ -81,7 +80,6 @@ function($scope, $http, $state) {
   
   $scope.data = [];
   socket.on('data', function(data) {
-    console.log(data);
     $scope.$apply(function() {
       $scope.data = data;
     });
