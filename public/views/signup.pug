@@ -1,0 +1,7 @@
+form(ng-submit='postSignup()')
+  input(type='text' ng-model='signupForm.username')
+  input(type='password' ng-model='signupForm.password')
+  input(type='password' ng-model='signupForm.passwordVerify')
+  input(type='submit' value='Signup')
+form
+  input(type='submit' value='Login' ui-sref='login')

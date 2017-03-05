@@ -1,0 +1,14 @@
+doctype html
+html(ng-app='pibot2')
+  head
+    title= title
+    script(src='/javascripts/angular.min.js')
+    script(src='/javascripts/angular-ui-router.min.js')
+    script(src='/javascripts/socket.io.min.js')
+    script(src='/javascripts/client.js')
+    
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    
+    base(href='/')
+  body
+    div(ui-view)
